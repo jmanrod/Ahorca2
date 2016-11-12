@@ -8,5 +8,6 @@
 
     <string name="insert_letter">Insert a letter</string>
     <string name="desc_btn_restart">Restart!</string>
+    <string name="flag">flag</string>
 
 </resources>

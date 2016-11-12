@@ -6,11 +6,23 @@
     android:orientation="vertical"
     android:gravity="center">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/flag"
+        android:src="@mipmap/ic_uk"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/word1"
         android:textSize="@dimen/words_and_underscores"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/flag"
+        android:src="@mipmap/ic_sp"/>
 
     <TextView
         android:layout_width="wrap_content"
