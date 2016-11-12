@@ -1,5 +1,6 @@
 package com.jorge.core;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -7,7 +8,7 @@ import java.util.regex.Pattern;
  * Created by Jorge on 10/11/2016.
  */
 
-public class Word {
+public class Word implements Serializable{
 
     private static final String UNDERSCORE = "_";
     public static final String WHITESPACE = " ";

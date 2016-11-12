@@ -1,7 +1,9 @@
 package com.jorge.ahorca2;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +11,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -22,14 +25,15 @@ import com.jorge.core.providers.WordsProvider;
 public class Ahorca2Main extends AppCompatActivity {
 
     public static final String WHITESPACE = " ";
+    private static final String GAME = "GAME";
 
     private TextView tvWord1;
     private TextView tvWord2;
     private EditText etLetter;
+    private ImageButton btnRestart;
 
     private WordsProvider wordsProvider;
     private BasicAhorca2WordsGame game;
-    private ImageButton btnRestart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +45,14 @@ public class Ahorca2Main extends AppCompatActivity {
         etLetter = (EditText) findViewById(R.id.letter);
         btnRestart = (ImageButton) findViewById(R.id.restart);
 
-        wordsProvider = new FakeWordsProvider();
-
         etLetter.addTextChangedListener(createWatcher());
         btnRestart.setOnClickListener(createClickListenerToRestart());
 
-        startGame();
+        wordsProvider = new FakeWordsProvider();
+
+        if(savedInstanceState == null) {
+            startNewGame();
+        }
     }
 
     @Override
@@ -72,12 +78,22 @@ public class Ahorca2Main extends AppCompatActivity {
         );
 
         etLetter.setVisibility(View.VISIBLE);
-        startGame();
+        startNewGame();
     }
 
-    private void startGame() {
+    private void startNewGame() {
         Ahorca2Words words = wordsProvider.getWords();
         game = new BasicAhorca2WordsGame(words);
+        updateTextViews();
+        resetTextViews();
+    }
+
+    private void resetTextViews() {
+        tvWord1.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+        tvWord2.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+    }
+
+    private void updateTextViews() {
         tvWord1.setText(includeWhitespaces(game.getWord1UnderScored()));
         tvWord2.setText(includeWhitespaces(game.getWord2UnderScored()));
     }
@@ -107,8 +123,7 @@ public class Ahorca2Main extends AppCompatActivity {
 
             Toast.makeText(this.getApplicationContext(),"Come on! You can do it better!", Toast.LENGTH_SHORT).show();
         } else if(game.replace(s)){
-            tvWord1.setText(includeWhitespaces(game.getWord1UnderScored()));
-            tvWord2.setText(includeWhitespaces(game.getWord2UnderScored()));
+            updateTextViews();
 
             etLetter.getBackground().setColorFilter(
                     Color.GREEN,
@@ -118,9 +133,7 @@ public class Ahorca2Main extends AppCompatActivity {
             Toast.makeText(this.getApplicationContext(),"Well done!", Toast.LENGTH_SHORT).show();
 
             if(game.isFinished()){
-                etLetter.setVisibility(View.INVISIBLE);
-                etLetter.clearFocus();
-                Toast.makeText(this.getApplicationContext(),"CONGRATULATIONS!! Game finished!!", Toast.LENGTH_LONG).show();
+                finishGame();
             }
         }else{
             Toast.makeText(this.getApplicationContext(),":(  Try again!", Toast.LENGTH_SHORT).show();
@@ -132,6 +145,19 @@ public class Ahorca2Main extends AppCompatActivity {
         }
         //Clean the EditText whithout launching an event
         etLetter.getText().clear();
+    }
+
+    private void finishGame() {
+        Toast.makeText(this.getApplicationContext(),"CONGRATULATIONS!! Game finished!!", Toast.LENGTH_LONG).show();
+        etLetter.setVisibility(View.INVISIBLE);
+        tvWord1.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+        tvWord2.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+        hideKeyboard(etLetter);
+    }
+
+    private void hideKeyboard(EditText etLetter) {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(etLetter.getWindowToken(), 0);
     }
 
     private String includeWhitespaces(String word) {
@@ -146,6 +172,21 @@ public class Ahorca2Main extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(GAME, game);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        game = (BasicAhorca2WordsGame) savedInstanceState.getSerializable(GAME);
+        updateTextViews();
+        if(game.isFinished())
+            finishGame();
     }
 
     @Override

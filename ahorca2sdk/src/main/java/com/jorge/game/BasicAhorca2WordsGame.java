@@ -1,7 +1,6 @@
 package com.jorge.game;
 
 import com.jorge.core.Ahorca2Words;
-import com.jorge.core.Word;
 
 import java.util.Set;
 import java.util.TreeSet;
