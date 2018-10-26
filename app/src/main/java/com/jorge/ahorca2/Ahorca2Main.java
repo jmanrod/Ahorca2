@@ -40,10 +40,10 @@ public class Ahorca2Main extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ahorca2_main);
 
-        tvWord1 = (TextView) findViewById(R.id.word1);
-        tvWord2 = (TextView) findViewById(R.id.word2);
-        etLetter = (EditText) findViewById(R.id.letter);
-        btnRestart = (ImageButton) findViewById(R.id.restart);
+        tvWord1 = findViewById(R.id.word1);
+        tvWord2 = findViewById(R.id.word2);
+        etLetter = findViewById(R.id.letter);
+        btnRestart = findViewById(R.id.restart);
 
         etLetter.addTextChangedListener(createWatcher());
         btnRestart.setOnClickListener(createClickListenerToRestart());
@@ -57,7 +57,7 @@ public class Ahorca2Main extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        super.onStart();
+        super.onResume();
         etLetter.requestFocus();
     }
 
@@ -109,6 +109,7 @@ public class Ahorca2Main extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 if (s != null && s.length() > 0) {
                     checkLetter(s.toString());
+                    etLetter.setText("");
                 }
             }
         };
@@ -157,7 +158,7 @@ public class Ahorca2Main extends AppCompatActivity {
 
     private void hideKeyboard(EditText etLetter) {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(etLetter.getWindowToken(), 0);
+        if(imm != null) imm.hideSoftInputFromWindow(etLetter.getWindowToken(), 0);
     }
 
     private String includeWhitespaces(String word) {
